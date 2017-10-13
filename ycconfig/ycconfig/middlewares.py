@@ -88,7 +88,7 @@ class PhantomJSMiddleware(object):
                             )
             # driver = webdriver.Chrome('D:\\work-path\\chromedriver',desired_capabilities=dcap)
 
-            driver.set_page_load_timeout(5)
+            driver.set_page_load_timeout(3)
             try:
                 driver.get(request.url)
             except:

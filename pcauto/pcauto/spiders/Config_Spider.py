@@ -38,11 +38,25 @@ class Config_Spider(scrapy.Spider):
                     url = 'http://price.pcauto.com.cn/sg%s/config.html'%car['ID']
                     yield scrapy.Request(
                         url=url, 
-                        callback=self.parse, 
+                        callback=self.all_sale, 
                         dont_filter=True,
                         meta=meta,
                         )
 
+    def all_sale(self, response):
+        offsale = response.xpath("//div[@class='stopDrop']/a/@href").extract()
+        url = ["http://price.pcauto.com.cn%s"%i for i in offsale]
+        url.append(response.url)
+        meta = response.meta
+        
+        for u in url:
+            yield scrapy.Request(
+                url=u, 
+                callback=self.parse, 
+                dont_filter=True,
+                meta=meta,
+                )
+        
 #http://price.pcauto.com.cn/sg7641/config.html
     def parse(self, response):
         item = PcautoItem()
@@ -60,8 +74,12 @@ class Config_Spider(scrapy.Spider):
         js_colors_text = re.search(r'var color = (\{.*\});', colors).group(1)
         js_innercolors_text = re.search(r'var innerColor = (\{.*\});', innercolors).group(1)
         now = datetime.datetime.now()
+
         if js_params_text:
-            js_params_code = json.loads(js_params_text.replace("curId", "\"curId\""))            
+            js_params_code = json.loads(js_params_text.replace("curId", "\"curId\""))
+            for vers in js_params_code['body']['items']:
+                if vers['Name'] == '变速箱类型':
+                    paidang = vers['ModelExcessIds']          
             version_cow = js_params_code['body']['items'][0]['ModelExcessIds']
             for vers in js_params_code['body']['items']:
                 for ind,v in enumerate(vers['ModelExcessIds']):
@@ -73,8 +91,9 @@ class Config_Spider(scrapy.Spider):
                     item['standard_version'] = version_cow[ind]['Value']
                     item['url'] = "http://price.pcauto.com.cn/m%s/config.html"%v['Id']
                     item['collect_date'] = now.strftime("%Y-%m-%d")
+                    item['paidang'] = paidang[ind]['Value']
                     yield item
-                    print(item)
+                    # print(item)
 
         if js_equips_text:
             js_equips_code = json.loads(js_equips_text)
@@ -88,8 +107,9 @@ class Config_Spider(scrapy.Spider):
                     item['standard_version'] = version_cow[ind]['Value']
                     item['url'] = "http://price.pcauto.com.cn/m%s/config.html"%v['Id']
                     item['collect_date'] = now.strftime("%Y-%m-%d")
+                    item['paidang'] = paidang[ind]['Value']
                     yield item
-                    print(item)
+                    # print(item)
 
         if js_colors_text:
             js_colors_code = json.loads(js_colors_text)
@@ -102,8 +122,9 @@ class Config_Spider(scrapy.Spider):
                 item['url'] = "http://price.pcauto.com.cn/m%s/config.html"%vers['SpecId']
                 item['collect_date'] = now.strftime("%Y-%m-%d")
                 item['karw'] = ' '.join([v['Name'] for v in vers['ColorList']])
+                item['paidang'] = paidang[ind]['Value']
                 yield item
-                print(item)
+                # print(item)
 
         if js_innercolors_text:
             js_innercolors_code = json.loads(js_innercolors_text)
@@ -116,6 +137,7 @@ class Config_Spider(scrapy.Spider):
                 item['url'] = "http://price.pcauto.com.cn/m%s/config.html"%vers['SpecId']
                 item['collect_date'] = now.strftime("%Y-%m-%d")
                 item['karw'] = ' '.join([v['Name'] for v in vers['innerColorList']])
+                item['paidang'] = paidang[ind]['Value']
 
                 yield item
-                print(item)
+                # print(item)

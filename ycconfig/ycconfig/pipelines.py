@@ -10,7 +10,7 @@ from scrapy.conf import settings
 
 class YcconfigPipeline(object):
     table = {
-            'yiche' : 'auxiliary_yiche_v3',
+            'yiche' : 'auxiliary_yiche_v5',
             'yichedealer' : 'auxiliary_yiche_dealer',
             }
 

@@ -10,7 +10,7 @@ from scrapy.conf import settings
 
 class PcautoPipeline(object):
     table = {
-            'pcauto_config' : 'auxiliary_pcauto',
+            'pcauto_config' : 'auxiliary_pcauto_v2',
             'pcautoDealer' : 'auxiliary_pcauto_dealer'
             }
 

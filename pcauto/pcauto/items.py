@@ -33,6 +33,7 @@ class PcautoItem(scrapy.Item):
 
     standard_version = scrapy.Field()  
 
+    paidang = scrapy.Field()
 # 经销商
 class DealerItem(scrapy.Item):
     dealer_id = scrapy.Field()

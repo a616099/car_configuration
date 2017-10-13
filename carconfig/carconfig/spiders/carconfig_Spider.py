@@ -19,9 +19,7 @@ class carconfig_Spider(scrapy.Spider):
             yield scrapy.Request(url=url, callback=self.car_url, dont_filter=True)
         
 
-        # request = scrapy.Request(url=self.test_url, callback=self.car_url, dont_filter=True)
-        # request.meta['PhantomJS'] = True
-        # yield request
+        # yield scrapy.Request(url=self.test_url, callback=self.parse, dont_filter=True)
 
     def car_url(self, response):
         if response.body:
@@ -38,11 +36,16 @@ class carconfig_Spider(scrapy.Spider):
                         meta['model'] = models[1:]
 
                         url = 'http://car.autohome.com.cn/config/series/%s.html'%models[1:]
+                        sale_url = 'http://www.autohome.com.cn/%s/sale.html'%models[1:]
 
-                        request = scrapy.Request(url=url, meta=meta, callback=self.parse, dont_filter=True)
-                        # request.meta['PhantomJS'] = True
-                        yield request
+                        yield scrapy.Request(url=url, meta=meta, callback=self.parse, dont_filter=True)
+                        yield scrapy.Request(url=sale_url, meta=meta, callback=self.all_model, dont_filter=True)
 
+    def all_model(self, response):
+        meta = response.meta
+        for i in response.xpath("//div[@class='models_nav']"):
+            url = 'http://www.autohome.com.cn/%s'%i.xpath("a/@href")[1].extract()
+            yield scrapy.Request(url=url, meta=meta, callback=self.parse, dont_filter=True)
 
     def parse(self, response):
         item = CarconfigItem()
@@ -58,6 +61,10 @@ class carconfig_Spider(scrapy.Spider):
         if paramtypeitems_json:
             paramtypeitems_ls = json.loads(paramtypeitems_json.group(1))
             name_list = paramtypeitems_ls[0]['paramitems'][0]['valueitems']
+            for i in paramtypeitems_ls:
+              for p in i['paramitems']:
+                if p['name'] == '变速箱类型':
+                  paidang = p['valueitems']
             for paramclassfy in paramtypeitems_ls:
                 paramitems = paramclassfy['paramitems']
                 for paramitem in paramitems:
@@ -71,7 +78,8 @@ class carconfig_Spider(scrapy.Spider):
                         item['karw'] = obj['value']
                         item['version_id'] = obj["specid"]
                         item['url'] = r"http://car.autohome.com.cn/config/spec/%s.html" % obj["specid"]
-                    
+                        item['paidang'] = paidang[ind]['value']
+
                         yield item
 
         if configtypeitems_json:
@@ -89,53 +97,6 @@ class carconfig_Spider(scrapy.Spider):
                         item['karw'] = obj['value']
                         item['version_id'] = obj["specid"]
                         item['url'] = r"http://car.autohome.com.cn/config/spec/%s.html" % obj["specid"]
+                        item['paidang'] = paidang[ind]['value']
+
                         yield item
-
-
-    # def parse(self, response):
-    #     text = get_complete_text_autohome(response.text)
-    #     sel = Selector(text=text)
-    #     item = CarconfigItem()
-    #     td = sel.xpath("//div[@id='config_nav']/table/tbody/tr/td")
-    #     if not td.extract_first():
-    #         return 
-    #     for ind, li in enumerate(td):
-    #         version_name = li.xpath("div[@class='carbox']/div/a/text()").extract_first()
-    #         if version_name:
-    #             url = li.xpath("div[@class='carbox']/div/a/@href").extract_first()
-    #             item['version_id'] = url.split('spec/')[-1].split('/#pvareaid')[0]
-    #             table = sel.xpath("//div[@id='config_data']/table[@class='tbcs']/tbody")
-
-    #             item['url'] = url
-    #             item['version'] = version_name
-    #             item['model'] = response.meta['model']
-    #             item['brand'] = response.meta['brand']
-    #             now = datetime.datetime.now()
-    #             item['collect_date'] = now.strftime("%Y-%m-%d")
-    #             for t_i, tab in enumerate(table):
-    #                 if t_i == 0:
-    #                     title = u'价格'
-    #                     for con in tab.xpath("tr"):
-    #                         th = con.xpath('th')[0].xpath('string(.)').extract_first()
-    #                         ll = con.xpath("td")[ind].xpath('string(.)').extract_first()
-                            
-    #                         item['classfy'] = title
-    #                         item['item'] = th
-    #                         item['karw']  = ll
-
-    #                         yield item
-    #                 else:
-    #                     title = tab.xpath("tr")[0].xpath("th/h3/span/text()").extract_first()
-    #                     for con in tab.xpath("tr")[1:]:
-    #                         th = con.xpath('th')[0].xpath('string(.)').extract_first()
-    #                         if  'carcolor' == con.xpath("th/div/@class").extract_first():
-    #                             color = con.xpath("td/div/ul/li/a/@title").extract()
-    #                             ll = ' '.join(color)
-    #                         else:
-    #                             ll = con.xpath("td")[ind].xpath('string(.)').extract_first()
-
-    #                         item['classfy'] = title
-    #                         item['item'] = th
-    #                         item['karw']  = ll
-
-    #                         yield item

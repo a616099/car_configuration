@@ -34,7 +34,9 @@ class YcconfigItem(scrapy.Item):
 
     standard_version = scrapy.Field()
 
-
+    paidang = scrapy.Field()
+    
+    model_pinyin = scrapy.Field()
 # 经销商
 class DealerItem(scrapy.Item):
     

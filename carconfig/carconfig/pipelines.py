@@ -11,7 +11,7 @@ from scrapy.conf import settings
 
 class CarconfigPipeline(object):
     table = {
-            'autohome_config' : 'auxiliary_autohome_v3',
+            'autohome_config' : 'auxiliary_autohome_v4',
             'autohomedealer' : 'auxiliary_autohome_dealer'
             }
 
