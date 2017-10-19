@@ -11,7 +11,6 @@ import scrapy
 class Auto163Item(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-
     brand = scrapy.Field()
     # 车型
     model = scrapy.Field()
@@ -30,6 +29,10 @@ class Auto163Item(scrapy.Item):
     karw = scrapy.Field()
     
     collect_date = scrapy.Field()  
+
+    standard_version = scrapy.Field()
+
+    paidang = scrapy.Field()
 
 
 # 经销商

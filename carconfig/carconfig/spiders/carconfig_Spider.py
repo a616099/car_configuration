@@ -64,7 +64,9 @@ class carconfig_Spider(scrapy.Spider):
             for i in paramtypeitems_ls:
               for p in i['paramitems']:
                 if p['name'] == '变速箱类型':
-                  paidang = p['valueitems']
+                    paidang = p['valueitems']
+                else:
+                    paidang = ''
             for paramclassfy in paramtypeitems_ls:
                 paramitems = paramclassfy['paramitems']
                 for paramitem in paramitems:
@@ -78,7 +80,10 @@ class carconfig_Spider(scrapy.Spider):
                         item['karw'] = obj['value']
                         item['version_id'] = obj["specid"]
                         item['url'] = r"http://car.autohome.com.cn/config/spec/%s.html" % obj["specid"]
-                        item['paidang'] = paidang[ind]['value']
+                        if paidang:
+                            item['paidang'] = paidang[ind]['value']
+                        else:
+                            item['paidang'] = paidang
 
                         yield item
 
@@ -97,6 +102,9 @@ class carconfig_Spider(scrapy.Spider):
                         item['karw'] = obj['value']
                         item['version_id'] = obj["specid"]
                         item['url'] = r"http://car.autohome.com.cn/config/spec/%s.html" % obj["specid"]
-                        item['paidang'] = paidang[ind]['value']
+                        if paidang:
+                            item['paidang'] = paidang[ind]['value']
+                        else:
+                            item['paidang'] = paidang
 
                         yield item

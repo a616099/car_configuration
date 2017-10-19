@@ -71,6 +71,8 @@ class Ycconfig_Spider(scrapy.Spider):
         for line in tr:
             if line.xpath('*')[0].xpath('string(.)').extract_first() == '燃油变速箱类型':
                 paidang_line = line.xpath('*')[1:].xpath('string(.)').extract()
+            elif line.xpath('*')[0].xpath('string(.)').extract_first() == '电动变速箱类型':
+                paidang_line = line.xpath('*')[1:].xpath('string(.)').extract()
 
         model = re.search(r'var CarCommonCSID = \'(.*)\';', response.text).group(1)
         brand = sel.xpath("//h1/a/img/@alt").extract_first()
@@ -96,7 +98,11 @@ class Ycconfig_Spider(scrapy.Spider):
                         color = line.xpath("*")[index+1].xpath("ul/li/a/@title").extract()
                         ll = ' '.join(color)
 
-                    item['paidang'] = paidang_line[index]
+                    if paidang_line:
+                        item['paidang'] = paidang_line[index]
+                    else:
+                        item['paidang'] = ''
+                        
                     item['version_id'] = version_id
                     item['version'] = version_name
                     item['classfy'] = title

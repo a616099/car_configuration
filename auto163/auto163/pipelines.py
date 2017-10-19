@@ -12,7 +12,7 @@ from scrapy.conf import settings
 
 class Auto163Pipeline(object):
     table = {
-            'auto163_config' : 'auxiliary_auto163',
+            'auto163_config' : 'auxiliary_auto163_v3',
             'auto163Dealer' : 'auxiliary_auto163_dealer',
             }
 

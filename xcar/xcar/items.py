@@ -29,7 +29,11 @@ class XcarItem(scrapy.Item):
 
     karw = scrapy.Field()
     
-    collect_date = scrapy.Field()  
+    collect_date = scrapy.Field() 
+    
+    standard_version = scrapy.Field()
+
+    paidang = scrapy.Field()
 
 class DealerItem(scrapy.Item):
     dealer_id = scrapy.Field()

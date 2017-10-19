@@ -79,7 +79,9 @@ class Config_Spider(scrapy.Spider):
             js_params_code = json.loads(js_params_text.replace("curId", "\"curId\""))
             for vers in js_params_code['body']['items']:
                 if vers['Name'] == '变速箱类型':
-                    paidang = vers['ModelExcessIds']          
+                    paidang = vers['ModelExcessIds']  
+                else:
+                    paidang = ''        
             version_cow = js_params_code['body']['items'][0]['ModelExcessIds']
             for vers in js_params_code['body']['items']:
                 for ind,v in enumerate(vers['ModelExcessIds']):
@@ -91,7 +93,11 @@ class Config_Spider(scrapy.Spider):
                     item['standard_version'] = version_cow[ind]['Value']
                     item['url'] = "http://price.pcauto.com.cn/m%s/config.html"%v['Id']
                     item['collect_date'] = now.strftime("%Y-%m-%d")
-                    item['paidang'] = paidang[ind]['Value']
+                    if paidang:
+                        item['paidang'] = paidang[ind]['Value']
+                    else:
+                        item['paidang'] = paidang
+                        
                     yield item
                     # print(item)
 
@@ -107,7 +113,10 @@ class Config_Spider(scrapy.Spider):
                     item['standard_version'] = version_cow[ind]['Value']
                     item['url'] = "http://price.pcauto.com.cn/m%s/config.html"%v['Id']
                     item['collect_date'] = now.strftime("%Y-%m-%d")
-                    item['paidang'] = paidang[ind]['Value']
+                    if paidang:
+                        item['paidang'] = paidang[ind]['Value']
+                    else:
+                        item['paidang'] = paidang
                     yield item
                     # print(item)
 
@@ -122,7 +131,10 @@ class Config_Spider(scrapy.Spider):
                 item['url'] = "http://price.pcauto.com.cn/m%s/config.html"%vers['SpecId']
                 item['collect_date'] = now.strftime("%Y-%m-%d")
                 item['karw'] = ' '.join([v['Name'] for v in vers['ColorList']])
-                item['paidang'] = paidang[ind]['Value']
+                if paidang:
+                    item['paidang'] = paidang[ind]['Value']
+                else:
+                    item['paidang'] = paidang
                 yield item
                 # print(item)
 
@@ -137,7 +149,10 @@ class Config_Spider(scrapy.Spider):
                 item['url'] = "http://price.pcauto.com.cn/m%s/config.html"%vers['SpecId']
                 item['collect_date'] = now.strftime("%Y-%m-%d")
                 item['karw'] = ' '.join([v['Name'] for v in vers['innerColorList']])
-                item['paidang'] = paidang[ind]['Value']
+                if paidang:
+                    item['paidang'] = paidang[ind]['Value']
+                else:
+                    item['paidang'] = paidang
 
                 yield item
                 # print(item)
